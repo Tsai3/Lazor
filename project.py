@@ -1,6 +1,82 @@
 import numpy as np
 from sympy.utilities.iterables import multiset_permutations
 
+
+class Lazor:
+    '''
+    This class carries creates a Lazor objecct.
+   
+    '''
+    
+    direction = None
+    board_rows = None
+    board_col = None
+    
+    def __init__(self, start_x, start_y, trajectory_x, trajectory_y, end_x = 0, end_y = 0):
+        '''
+        Initializes the Lazor object
+        '''
+        self.start_x = start_x
+        self.start_y = start_y
+        self.trajectory_x = trajectory_x
+        self.trajectory_y = trajectory_y
+        
+        if trajectory_x > 0 and trajectory_y > 0:
+            self.direction = 'bottom_Right'
+            self.end_x = self.board_rows
+            self.end_y = self.board_col
+        if trajectory_x < 0 and trajectory_y > 0:
+            self.direction = 'bottom_Left'
+            self.end_x = 0
+            self.end_y = self.board_col
+        if trajectory_x > 0 and trajectory_y < 0:
+            self.direction = 'top_Right'
+            self.end_x = self.board_rows
+            self.end_y = 0
+        if trajectory_x < 0 and trajectory_y < 0:
+            self.direction = 'top_Left'
+            self.end_x = 0
+            self.end_y = 0
+            
+    
+class Block:
+    '''
+    This class carries creates a Block objecct.
+   
+    '''
+
+    def __init__(self, y_position, x_position, type): #has to be reversed as we view the coordinate system differently to how numpy does
+        '''
+        
+        '''
+        self.LeftWall = (2*x_position,2*y_position+1)
+        self.RightWall = (2*(x_position+1),2*y_position+1)
+        self.TopWall = (2*x_position+1,2*y_position)
+        self.BottomWall = (2*x_position+1,2*(y_position+1))
+        self.type = type
+        self.x_position = x_position
+        self.y_position = y_position
+
+    def get_Left_Wall(self):
+        return self.LeftWall
+    def get_Right_Wall(self):
+        return self.RightWall
+    def get_Top_Wall(self):
+        return self.TopWall
+    def get_Bottom_Wall(self):
+        return self.BottomWall
+    def get_Type(self):
+        return self.type
+    
+    def get_x(self):
+        return self.x_position
+    def get_y(self):
+        return self.y_position
+    
+    def __call__(self):
+        return self.LeftWall, self.RightWall, self.TopWall, self.BottomWall, self.type
+    
+
 class Board:
     '''
     This class carries creates a Board objecct.
@@ -232,28 +308,82 @@ def rebuild_matrix(original_board, added_block_set):
     
     return new_board_matrix
 
+def get_All_Left_Walls(board):
+    left_walls_arr = []
+    board_array = np.array(board)
+    board_rows, board_col = board_array.shape
+    
+    for i in range(board_rows):
+        for j in range(board_col):
+            block_type = board_array[i][j]
+            if block_type != 'x' and block_type != 'o':
+                selected_block = Block(i,j,block_type)
+                left_walls_arr.append(selected_block.get_Left_Wall())
+    
+    return left_walls_arr
 
+def get_All_Right_Walls(board):
+    right_walls_arr = []
+    board_array = np.array(board)
+    board_rows, board_col = board_array.shape
+    
+    for i in range(board_rows):
+        for j in range(board_col):
+            block_type = board_array[i][j]
+            if block_type != 'x' and block_type != 'o':
+                selected_block = Block(i,j,block_type)
+                right_walls_arr.append(selected_block.get_Right_Wall())
+    
+    return right_walls_arr
+
+def get_All_Top_Walls(board):
+    top_walls_arr = []
+    board_array = np.array(board)
+    board_rows, board_col = board_array.shape
+    
+    for i in range(board_rows):
+        for j in range(board_col):
+            block_type = board_array[i][j]
+            if block_type != 'x' and block_type != 'o':
+                selected_block = Block(i,j,block_type)
+                top_walls_arr.append(selected_block.get_Top_Wall())
+    
+    return top_walls_arr
+
+def get_All_Bottom_Walls(board):
+    bottom_walls_arr = []
+    board_array = np.array(board)
+    board_rows, board_col = board_array.shape
+    
+    for i in range(board_rows):
+        for j in range(board_col):
+            block_type = board_array[i][j]
+            if block_type != 'x' and block_type != 'o':
+                selected_block = Block(i,j,block_type)
+                bottom_walls_arr.append(selected_block.get_Bottom_Wall())
+    
+    return bottom_walls_arr
 
 if __name__ == "__main__":
-    #Create a board object
-    board, A, B, C, lasers, points = read_board('mad_1.bff')
-    Board1 = Board(board,A,B,C,lasers,points)
+    #Create a fixed set of all the intersection point
+    board, A, B, C, lasers, points = read_board('mad_7.bff')
+    Board1 = Board(board, A, B, C, lasers, points)
+    num_A_blocks = Board1.get_A_Blocks()
+    num_B_blocks = Board1.get_B_Blocks()
+    num_C_blocks = Board1.get_C_Blocks()
+    
+    board_permutations = get_board_permutations(board,num_A_blocks,num_B_blocks,num_C_blocks)
+    
+    print(board_permutations[1])
+    print(rebuild_matrix(board,board_permutations[1]))
+    
+    new_board = rebuild_matrix(board,board_permutations[1])
+    
+    print(get_All_Left_Walls(new_board))
+
+
+
 
     
-    print(Board1.get_Board_Matrix())
-    print(Board1.get_A_Blocks())
-    print(Board1.get_B_Blocks())
-    print(Board1.get_C_Blocks())
-    print(Board1.get_Lasers())
-    print(Board1.get_points())
     
-    
-    Board1.add_Lazor(0,0,1,1)
-    print(Board1.get_Lasers())
-    
-
-    
-    
-
-        
   
