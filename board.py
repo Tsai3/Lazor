@@ -111,16 +111,16 @@ def read_board(string):
                 
         board_matrix.append(board_row)
             
-    points_set = set()
+    points_arr = []
 
 
     for i in range(len(points)):
         x_coordinate = int(points[i][2])
         y_coordinate = int(points[i][4])
-        points_set.add((x_coordinate, y_coordinate))
+        points_arr.append((x_coordinate, y_coordinate))
         
-    lasers_set = set()
-
+    lasers_arr = []
+    lasers_dir_arr = []
 
     for i in range(len(lasers)):
         laser_string_arr = lasers[i].split(' ')
@@ -129,12 +129,12 @@ def read_board(string):
         vx_coordinate = int(laser_string_arr[3])
         vy_coordinate = int(laser_string_arr[4])
         
-        lasers_set.add((x_coordinate, y_coordinate,vx_coordinate, vy_coordinate))
-        
+        lasers_arr.append((x_coordinate, y_coordinate))
+        lasers_dir_arr.append((vx_coordinate, vy_coordinate))
       
     board_matrix_array = np.array(board_matrix)  
       
-    return board_matrix_array, A_blocks, B_blocks, C_blocks, lasers_set, points_set
+    return board_matrix_array, A_blocks, B_blocks, C_blocks, lasers_arr, lasers_dir_arr, points_arr
 
 def get_board_permutations(board, num_of_A, num_of_B, num_of_C):
     '''
