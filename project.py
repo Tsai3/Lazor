@@ -668,11 +668,12 @@ def rebuild_matrix(original_board, added_block_set):
     board_rows, board_col = board_array.shape
     
     new_board_matrix = copy.copy(original_board)
-    
+    print(added_block_set)
     for i in (added_block_set):
+        print(i)
         added_type = i[0]
-        added_x = i[1]
-        added_y = i[2]
+        added_x = i[2]
+        added_y = i[1]
         new_board_matrix[added_x][added_y] = added_type
             
     
@@ -808,7 +809,7 @@ if __name__ == "__main__":
     #Create a fixed set of all the intersection point
     board, A, B, C, lasers, laser_dir, points = read_board('mad_1.bff')
     Original_Board = Board(board, A, B, C, lasers, laser_dir, points)
-    
+    # print(board)
     board_height, board_width = board.shape
     matrix_height = board_height*2 + 1
     matrix_width = board_width*2 + 1
@@ -819,7 +820,7 @@ if __name__ == "__main__":
     
     board_permutations = get_board_permutations(board,num_A_blocks,num_B_blocks,num_C_blocks)
     total_permutations = len(board_permutations)
-    
+    print(board_permutations[6])
     board_permutations_index = 0
     true_path_index = 0
     Does_Laser_Hit_Targets = False
