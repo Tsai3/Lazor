@@ -1142,18 +1142,49 @@ def get_board_permutations(board, num_of_A, num_of_B, num_of_C):
         
     #Find the board matrix coordinates of the added blocks and add it to a set containing the type   
         added_blocks_set = []
+        total_allowed_to_be_placed = num_A_blocks+num_B_blocks+num_C_blocks
+        
+        placed_count = 0
+        
         for i in range(len(restored_board_permutation)):
+            
             block_type = restored_board_permutation[i]
             row_num = i // board_col
             col_num = i % board_col
             
+                
+                
             # print(row_num,col_num)
+            
             if block_type != 'o' and (row_num, col_num) not in fixed_blocks:
+                    
                 added_blocks_set.append((block_type, col_num, row_num))
+        
+                if block_type != 'x':
+                    placed_count += 1
+        
+        # print(placed_count)
+        # if (placed_count- fixed_count >= total_allowed_to_be_placed) == True:
+        #     print(" ")  
+             
+                
                 # if test_me:
                 #     print((block_type, row_num, col_num))
-                
+        
+        
+        
+        # print(len(added_blocks_set))
+        # for items in added_blocks_set:
+        #     placed_count = 0
+        #     # print(placed_count - fixed_count, total_allowed_to_be_placed
+        #     if (placed_count - fixed_count >= total_allowed_to_be_placed) == True:
+        #                 print('Sad!')
+        
+        
         added_blocks_permutations.append(added_blocks_set)
+                    
+        
+                
         test_me = False
     
     return added_blocks_permutations, fixed_count
@@ -1303,7 +1334,7 @@ def get_All_Refract_Walls(board):
 
 if __name__ == "__main__":
     #Create a fixed set of all the intersection point
-    board, A, B, C, lasers, laser_dir, points = read_board('yarn_5.bff')
+    board, A, B, C, lasers, laser_dir, points = read_board('mad_1.bff')
     Original_Board = Board(board, A, B, C, lasers, laser_dir, points)
     print(board)
     board_height, board_width = board.shape
@@ -1316,26 +1347,63 @@ if __name__ == "__main__":
     
     board_permutations, fixed_count= get_board_permutations(board,num_A_blocks,num_B_blocks,num_C_blocks)
     
+    
+    
     total_permutations = len(board_permutations)
-    # print(total_permutations)
+    print(total_permutations)
     board_permutations_index = 0
     true_path_index = 0
     Does_Laser_Hit_Targets = False
     
+    # board_permutations_set = set(board_permutations)
+    
     m = Matrix(matrix_width,matrix_height)
     m.print_matrix_with_indices()
     
-    while Does_Laser_Hit_Targets != True:
     
-    # for i in range(0,1,1):
+    target_list_len = len(copy.copy(Original_Board.get_points()))
+    print(target_list_len)
+    
+    current_match = 0
+    laser_path_points_to_remember = list()
+    check_bool = False  
+       
+    while Does_Laser_Hit_Targets != True:
+    # for i in range(0,10,1):
+        
+        # if laser_path_points_to_remember != 0:
+        #     for i in laser_path_points_to_remember:
+        #         if(i in board_permutations[board_permutations_index]):
+        #             # check_bool =True
+        #             print('yeay')
+        #             print(board_permutations_index)
+        #             # print(check_bool)
+        #     # if check_bool != True:
+        #     #     board_permutations_index+=1
+        #     #     continue
+        
         
         Board1 = Board(board, A, B, C, lasers, laser_dir, points)
         print(board_permutations_index)
         
         
+        placed_count = 0
+        total_allowed_to_be_placed = num_A_blocks+num_B_blocks+num_C_blocks
         
-        # print(board_permutations[board_permutations_index])
-        # print(rebuild_matrix(board,board_permutations[board_permutations_index]))
+        # for items in board_permutations[board_permutations_index]:
+        #     if items[0] != 'x':
+        #         placed_count += 1
+        
+        # if (placed_count - fixed_count >= total_allowed_to_be_placed) == False:
+        #             # print('Sad!')
+        #             board_permutations_index+=1
+        #             continue
+        
+        # print("hehes")
+        # print(placed_count - fixed_count >= total_allowed_to_be_placed)
+        # print(" ")
+        print(board_permutations[board_permutations_index])
+        # # print(rebuild_matrix(board,board_permutations[board_permutations_index]))
         new_board = rebuild_matrix(board,board_permutations[board_permutations_index])
         # print(board)
         # print("test")
@@ -1446,8 +1514,18 @@ if __name__ == "__main__":
             index += 1
         target_list_set = set(target_list)    
         laser_path_set = set(m.get_colored_array())
-        # print("Targets: ", target_list_set)
-        # print("Laser Path: ", laser_path_set)
+        
+        this_iteration_overlap = len(list(laser_path_set.intersection(target_list_set)))
+        
+        if(this_iteration_overlap > current_match):
+            print(this_iteration_overlap)
+            # print("Targets: ", target_list_set)
+            # print("Laser Path: ", laser_path_set)
+            print(board_permutations[board_permutations_index])
+            current_match = this_iteration_overlap
+            laser_path_points_to_remember = board_permutations[board_permutations_index]
+            
+        
         if target_list_set.issubset(laser_path_set) :
             placed_count = 0
             for items in board_permutations[board_permutations_index]:
@@ -1463,11 +1541,10 @@ if __name__ == "__main__":
         if (board_permutations_index == total_permutations):
             Does_Laser_Hit_Targets = True
             
-
         board_permutations_index+=1
         
     
-
+        # print(board_permutations[true_path_index])
         # m.print_matrix_with_indices()
         # print(laser_list)
         
