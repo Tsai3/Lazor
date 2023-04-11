@@ -358,7 +358,7 @@ def laser_1_step(matrix, laser_pos, laser_dir):
     # print(x,y)
     # print(next_pos)
     # print(y+1, y+1 < 9)
-    print(m.max_row(), m.max_column())
+    # print(m.max_row(), m.max_column())
     
     #check if next_position is in matrix
     if next_pos[0] <0 or next_pos[0] > (m.max_column()-1) or next_pos[1] <0 or next_pos[1] > (m.max_row()-1):
@@ -375,60 +375,108 @@ def laser_1_step(matrix, laser_pos, laser_dir):
     ### All Walls Checkable ###
     
     elif x-1 >= 0 and x+1 < (m.max_column()) and y -1 >=0 and y+1 < (m.max_row()) and x-dx >= 0 and x+dx < (m.max_column()) and y -dy >=0 and y+dy < (m.max_row()):
-        # Is literally everywhere around me a relect block
-        if  m.get_element(x+dx,y+dy) == 'A' and (m.get_element(x,(y+1)) == 'A' or m.get_element(x,(y+1)) == 'B') and (m.get_element(x,(y-1)) == 'A' or m.get_element(x,(y-1)) == 'B') and (m.get_element((x+1),(y)) =="A" or m.get_element((x+1),(y)) =="B") and (m.get_element((x-1),(y)) == 'A' or m.get_element((x-1),(y)) == 'B'): 
+        # Is literally everywhere around me a relect block or opaque block
+        if  (m.get_element(x+dx,y+dy) == 'A') and (m.get_element(x,(y+1)) == 'A' or m.get_element(x,(y+1)) == 'B') and (m.get_element(x,(y-1)) == 'A' or m.get_element(x,(y-1)) == 'B') and (m.get_element((x+1),(y)) =="A" or m.get_element((x+1),(y)) =="B") and (m.get_element((x-1),(y)) == 'A' or m.get_element((x-1),(y)) == 'B'): 
             # print('help-0')
             next_dir = (0, 0)
             next_pos = (x + 0, y + 0)
             return True, 'stop', next_pos, next_dir
         
         # Is the Laser on the left or right edge of a block and is it trying to go to a reflect wall through itself.
-        elif m.get_element(x+dx,y+dy) == 'A' and m.get_element(x,(y+1)) != 'o' and m.get_element(x,(y-1)) != 'o' and  m.get_element((x+dx),(y)=='A'): 
+        elif m.get_element(x+dx,y+dy) == 'A' and (m.get_element(x,(y+1)) == 'A' or m.get_element(x,(y+1)) == 'B') and (m.get_element(x,(y-1)) == 'A' or m.get_element(x,(y-1)) == 'B') and  m.get_element((x+dx),(y))=='A': 
             # print('help-1')
-            next_dir = (0, 0)
-            next_pos = (x - 0, y + 0)
-            return True, 'stop', next_pos, next_dir
+            # print(dx)
+            # print(m.get_element((x+dx),(y)))
+            # print('huh')
+            # print((m.get_element(x,(y+1)) == 'A' or m.get_element(x,(y+1)) == 'B')) #this is true
+            next_dir = (-dx, dy)
+            # print(next_dir)
+            # print(x,y)
+            next_pos = (x - dx, y + dy)
+            # print(next_pos)
+            return True, 'reflect', next_pos, next_dir 
     
         # Is the Laser on the top or bottom edge of a block and is it trying to go to a reflect wall through itself.
-        elif m.get_element(x,y+dy) != 'o' and m.get_element((x+1),(y)) != 'o' and m.get_element((x-1),(y)) != 'o' and m.get_element((x),(y+dy)) == 'A': 
+        elif m.get_element(x+dx,y+dy) == 'A' and (m.get_element((x+1),(y)) =="A" or m.get_element((x+1),(y)) =="B") and (m.get_element((x-1),(y)) == 'A' or m.get_element((x-1),(y)) == 'B') and m.get_element((x),(y+dy)) == 'A': 
             # print('help-2')
-            print(m.get_element((x-1),(y)) != m.get_element((x+1),(y)))
-            next_dir = (0, 0)
-            next_pos = (x + 0, y + 0)
-            return True, 'stop', next_pos, next_dir
-        
-        # Is the Laser on the left or right edge of a block and is it trying to go to a reflect wall NOT through itself.
-        elif m.get_element(x+dx,y+dy) == 'A' and m.get_element(x,(y+1)) != 'o' and m.get_element(x,(y-1)) != 'o' and  m.get_element((x+dx),(y)!='A'): 
-            # print('help-3')
-            next_dir = (-dx, dy)
-            next_pos = (x - dx, y + dy)
-            return True, 'reflect', next_pos, next_dir
-    
-        # Is the Laser on the top or bottom edge of a block and is it trying to go to a reflect wall NOR through itself.
-        elif m.get_element(x,y+dy) != 'o' and m.get_element((x+1),(y)) != 'o' and m.get_element((x-1),(y)) != 'o' and m.get_element((x),(y+dy)) != 'A': 
-            # print('help-4')
-            print(m.get_element((x-1),(y)) != m.get_element((x+1),(y)))
+            # print(m.get_element((x),(y+dy)))
+            # print((x,y),(dx,dy))
+            # print(m.get_element((x-1),(y)) != m.get_element((x+1),(y)))
             next_dir = (dx, -dy)
             next_pos = (x + dx, y - dy)
             return True, 'reflect', next_pos, next_dir
         
+        # Is the Laser on the left or right edge of a block and is it trying to go to a reflect wall NOT through itself.
+        elif m.get_element(x+dx,y+dy) == 'A' and (m.get_element(x,(y+1)) == 'A' or m.get_element(x,(y+1)) == 'B') and (m.get_element(x,(y-1)) == 'A' or m.get_element(x,(y-1)) == 'B') and  m.get_element((x+dx),(y)!='A'): 
+            # print('help-3')
+            
+            m.set_color(x+dx, y+dy, '41')
+            side = laser_contact_side(matrix, laser_pos, laser_dir)
+            # print(side)
+            if side == 'top' or side == 'down':
+                next_dir = (dx, -dy)
+            if side == 'left' or side == 'right':
+                next_dir = (-dx, dy)
+            # print(next_pos, next_dir)
+            return True, 'reflect', next_pos, next_dir
+            
+            # next_dir = (-dx, dy)
+            # next_pos = (x + dx, y + dy)
+            # return True, 'reflect', next_pos, next_dir
+    
+        # Is the Laser on the top or bottom edge of a block and is it trying to go to a reflect wall NOT through itself.
+        elif m.get_element(x+dx,y+dy) == 'A' and (m.get_element((x+1),(y)) =="A" or m.get_element((x+1),(y)) =="B") and (m.get_element((x-1),(y)) == 'A' or m.get_element((x-1),(y)) == 'B') and m.get_element((x),(y+dy)) != 'A': 
+            # print('help-4')
+            
+            m.set_color(x+dx, y+dy, '41')
+            side = laser_contact_side(matrix, laser_pos, laser_dir)
+            # print(side)
+            if side == 'top' or side == 'down':
+                next_dir = (dx, -dy)
+            if side == 'left' or side == 'right':
+                next_dir = (-dx, dy)
+            # print(next_pos, next_dir)
+            return True, 'reflect', next_pos, next_dir
+            
+            # # print(m.get_element((x-1),(y)) != m.get_element((x+1),(y)))
+            # next_dir = (dx, -dy)
+            # next_pos = (x + dx, y + dy)
+            # return True, 'reflect', next_pos, next_dir
+        
         
         
     
-        # Is the Laser on the left or right edge of a block and is it trying to go through an opaque block
-        elif (m.get_element(x,(y+1)) != 'o' and m.get_element(x,(y-1)) != 'o' and m.get_element(x+dx,y+dy)) == 'B' and m.get_element((x),(y+1)) ==m.get_element((x),(y-1)): 
+        # Is the Laser on the left or right edge of a block and is it trying to go to an opaque block through itself
+        elif m.get_element(x+dx,y+dy) == 'B' and (m.get_element(x,(y+1)) == 'A' or m.get_element(x,(y+1)) == 'B') and (m.get_element(x,(y-1)) == 'A' or m.get_element(x,(y-1)) == 'B') and  m.get_element((x+dx),(y))=='B': 
             # print('help-5')
             next_dir = (0, 0)
             next_pos = (x - 0, y + 0)
             return True, 'stop', next_pos, next_dir
          
-        # Is the Laser on the top or bottom edge of a block and is it trying to go through an opaque block
-        elif (m.get_element((x+1),(y)) != 'o' and m.get_element((x-1),(y)) != 'o' and m.get_element(x+dx,y+dy)) == 'B' and m.get_element((x+1),(y)) ==m.get_element((x-1),(y)): 
+        # Is the Laser on the top or bottom edge of a block and is it trying to go to an opaque block through itself
+        elif m.get_element(x+dx,y+dy) == 'B' and (m.get_element((x+1),(y)) =="A" or m.get_element((x+1),(y)) =="B") and (m.get_element((x-1),(y)) == 'A' or m.get_element((x-1),(y)) == 'B') and m.get_element((x),(y+dy)) == 'B': 
             # print('help-6')
         
             next_dir = (0, 0)
             next_pos = (x + 0, y - 0)
             return True, 'stop', next_pos, next_dir
+        
+        
+        
+        # Is the Laser on the left or right edge of a block and is it trying to go to a opaque wall NOT through itself.
+        elif m.get_element(x+dx,y+dy) == 'B' and (m.get_element(x,(y+1)) == 'A' or m.get_element(x,(y+1)) == 'B') and (m.get_element(x,(y-1)) == 'A' or m.get_element(x,(y-1)) == 'B') and  m.get_element((x+dx),(y)!='B'): 
+            
+            m.set_color(x+dx, y+dy, '41')
+            next_dir =(0, 0)
+            return True, 'stop', next_pos, next_dir, new_dir
+    
+        # Is the Laser on the top or bottom edge of a block and is it trying to go to a opaque wall NOT through itself.
+        elif m.get_element(x+dx,y+dy) == 'B' and (m.get_element((x+1),(y)) =="A" or m.get_element((x+1),(y)) =="B") and (m.get_element((x-1),(y)) == 'A' or m.get_element((x-1),(y)) == 'B') and m.get_element((x),(y+dy)) != 'B': 
+            
+            m.set_color(x+dx, y+dy, '41')
+            next_dir =(0, 0)
+            return True, 'stop', next_pos, next_dir, new_dir
+        
 
     
         # Is the Laser on the left or right edge of a block and is it trying to go through a refract block
@@ -463,23 +511,27 @@ def laser_1_step(matrix, laser_pos, laser_dir):
                 return True, 'retract', next_pos, next_dir, new_dir, og_pos
         # when laser meets reflect block, A
         elif m.get_element(x+dx,y+dy) == 'A':
-                m.set_color(x+dx, y+dy, '41')
-                side = laser_contact_side(matrix, laser_pos, laser_dir)
-            
-                if side == 'top' or side == 'down':
-                    next_dir = (dx, -dy)
-                if side == 'left' or side == 'right':
-                    next_dir = (-dx, dy)
-                return True, 'reflect', next_pos, next_dir
+            # print('help-9')
+            m.set_color(x+dx, y+dy, '41')
+            side = laser_contact_side(matrix, laser_pos, laser_dir)
+        
+            if side == 'top' or side == 'down':
+                next_dir = (dx, -dy)
+            if side == 'left' or side == 'right':
+                next_dir = (-dx, dy)
+            # print(next_pos, next_dir)
+            return True, 'reflect', next_pos, next_dir
             
         # when laser meets opaque, B
         elif m.get_element(x+dx, y+dy) == 'B':
+            # print('help-10')
             m.set_color(x+dx, y+dy, '41')
             next_dir =(0, 0)
             return True, 'stop', next_pos, next_dir, new_dir
         
         # when laser meets refract block, C
         elif m.get_element(x+dx, y+dy) == 'C':
+            # print('help-11')
             # print('re')
             m.set_color(x+dx, y+dy, '41')
             if m.get_element(x, y) == 'C':
@@ -499,29 +551,41 @@ def laser_1_step(matrix, laser_pos, laser_dir):
     
     elif y+1 == (m.max_row()):
         
-    
+        # (print('bottom'))
         # Is the Laser on the top or bottom edge of a block and is it trying to go to a reflect wall through itself.
         if m.get_element(x,y+dy) != 'o' and m.get_element((x+1),(y)) != 'o' and m.get_element((x-1),(y)) != 'o' and m.get_element((x),(y+dy)) == 'A': 
-            print('help-2')
-            print(m.get_element((x-1),(y)) != m.get_element((x+1),(y)))
+            # print('help-2')
+            # print(m.get_element((x-1),(y)) != m.get_element((x+1),(y)))
             next_dir = (0, 0)
             next_pos = (x + 0, y + 0)
             return True, 'stop', next_pos, next_dir
         
         
-        # Is the Laser on the top or bottom edge of a block and is it trying to go through an opaque block
-        elif (m.get_element((x+1),(y)) != 'o' and m.get_element((x-1),(y)) != 'o' and m.get_element(x+dx,y+dy)) == 'B' and m.get_element((x+1),(y)) ==m.get_element((x-1),(y)): 
+      
+         
+        # Is the Laser on the top or bottom edge of a block and is it trying to go to an opaque block through itself
+        elif m.get_element(x+dx,y+dy) == 'B' and (m.get_element((x+1),(y)) =="A" or m.get_element((x+1),(y)) =="B") and (m.get_element((x-1),(y)) == 'A' or m.get_element((x-1),(y)) == 'B') and m.get_element((x),(y+dy)) == 'B': 
             # print('help-6')
         
             next_dir = (0, 0)
             next_pos = (x + 0, y - 0)
             return True, 'stop', next_pos, next_dir
+        
+        
+        
+    
+        # Is the Laser on the top or bottom edge of a block and is it trying to go to a opaque wall NOT through itself.
+        elif m.get_element(x+dx,y+dy) == 'B' and (m.get_element((x+1),(y)) =="A" or m.get_element((x+1),(y)) =="B") and (m.get_element((x-1),(y)) == 'A' or m.get_element((x-1),(y)) == 'B') and m.get_element((x),(y+dy)) != 'B': 
+            
+            m.set_color(x+dx, y+dy, '41')
+            next_dir =(0, 0)
+            return True, 'stop', next_pos, next_dir, new_dir
     
             
             
         # Is the Laser on the top or bottom edge of a block and is it trying to go through a refract block
         elif (m.get_element((x+1),(y)) != 'o' and m.get_element((x-1),(y)) != 'o' and m.get_element(x+dx,y+dy)) == 'C' and m.get_element((x+1),(y)) ==m.get_element((x-1),(y)): 
-            print('help-8')
+            # print('help-8')
             if m.get_element(x+dx, y+dy) == 'C':
                 side = 'top'
                 if side == 'top' or side == 'down':
@@ -536,12 +600,23 @@ def laser_1_step(matrix, laser_pos, laser_dir):
                 return True, 'retract', next_pos, next_dir, new_dir, og_pos
             
         # Is the Laser on the top or bottom edge of a block and is it trying to go to a reflect wall NOT through itself.
-        elif m.get_element(x,y+dy) != 'o' and m.get_element((x+1),(y)) != 'o' and m.get_element((x-1),(y)) != 'o' and m.get_element((x),(y+dy)) != 'A': 
-            print('help-4')
-            print(m.get_element((x-1),(y)) != m.get_element((x+1),(y)))
-            next_dir = (dx, -dy)
-            next_pos = (x + dx, y - dy)
+        elif m.get_element(x+dx,y+dy) == 'A' and m.get_element((x+1),(y)) != 'o' and m.get_element((x-1),(y)) != 'o' and m.get_element((x),(y+dy)) != 'A': 
+            # print('help-4')
+            
+            m.set_color(x+dx, y+dy, '41')
+            side = laser_contact_side(matrix, laser_pos, laser_dir)
+            # print(side)
+            if side == 'top' or side == 'down':
+                next_dir = (dx, -dy)
+            if side == 'left' or side == 'right':
+                next_dir = (-dx, dy)
+            # print(next_pos, next_dir)
             return True, 'reflect', next_pos, next_dir
+            
+            # # print(m.get_element((x-1),(y)) != m.get_element((x+1),(y)))
+            # # next_dir = (dx, -dy)
+            # # next_pos = (x + dx, y + dy)
+            # return True, 'reflect', next_pos, next_dir
             
         # when laser meets reflect block, A
         elif m.get_element(x+dx,y+dy) == 'A':
@@ -584,22 +659,41 @@ def laser_1_step(matrix, laser_pos, laser_dir):
         # Is the Laser on the top or bottom edge of a block and is it trying to go to a reflect wall through itself.
         if m.get_element(x,y+dy) != 'o' and m.get_element((x+1),(y)) != 'o' and m.get_element((x-1),(y)) != 'o' and m.get_element((x),(y+dy)) == 'A': 
             # print('help-2')
-            print(m.get_element((x-1),(y)) != m.get_element((x+1),(y)))
+            # print(m.get_element((x-1),(y)) != m.get_element((x+1),(y)))
             next_dir = (0, 0)
             next_pos = (x + 0, y + 0)
             return True, 'stop', next_pos, next_dir
     
     
-        
-        
+        # Is the Laser on the top or bottom edge of a block and is it trying to go to a reflect wall NOT through itself.
+        elif m.get_element(x+dx,y+dy) == 'A' and m.get_element((x+1),(y)) != 'o' and m.get_element((x-1),(y)) != 'o' and m.get_element((x),(y+dy)) != 'A': 
+            m.set_color(x+dx, y+dy, '41')
+            side = laser_contact_side(matrix, laser_pos, laser_dir)
+            if side == 'top' or side == 'down':
+                next_dir = (dx, -dy)
+            if side == 'left' or side == 'right':
+                next_dir = (-dx, dy)
+            return True, 'reflect', next_pos, next_dir
+    
+
          
-        # Is the Laser on the top or bottom edge of a block and is it trying to go through an opaque block
-        elif (m.get_element((x+1),(y)) != 'o' and m.get_element((x-1),(y)) != 'o' and m.get_element(x+dx,y+dy)) == 'B' and m.get_element((x+1),(y)) ==m.get_element((x-1),(y)): 
+        # Is the Laser on the top or bottom edge of a block and is it trying to go to an opaque block through itself
+        elif m.get_element(x+dx,y+dy) == 'B' and (m.get_element((x+1),(y)) =="A" or m.get_element((x+1),(y)) =="B") and (m.get_element((x-1),(y)) == 'A' or m.get_element((x-1),(y)) == 'B') and m.get_element((x),(y+dy)) == 'B': 
             # print('help-6')
         
             next_dir = (0, 0)
             next_pos = (x + 0, y - 0)
             return True, 'stop', next_pos, next_dir
+        
+        
+        
+    
+        # Is the Laser on the top or bottom edge of a block and is it trying to go to a opaque wall NOT through itself.
+        elif m.get_element(x+dx,y+dy) == 'B' and (m.get_element((x+1),(y)) =="A" or m.get_element((x+1),(y)) =="B") and (m.get_element((x-1),(y)) == 'A' or m.get_element((x-1),(y)) == 'B') and m.get_element((x),(y+dy)) != 'B': 
+            
+            m.set_color(x+dx, y+dy, '41')
+            next_dir =(0, 0)
+            return True, 'stop', next_pos, next_dir, new_dir
 
     
      
@@ -620,13 +714,7 @@ def laser_1_step(matrix, laser_pos, laser_dir):
                 og_pos = (x+dx,y+dy)
                 return True, 'retract', next_pos, next_dir, new_dir, og_pos
             
-        # Is the Laser on the top or bottom edge of a block and is it trying to go to a reflect wall NOT through itself.
-        elif m.get_element(x,y+dy) != 'o' and m.get_element((x+1),(y)) != 'o' and m.get_element((x-1),(y)) != 'o' and m.get_element((x),(y+dy)) != 'A': 
-            # print('help-4')
-            print(m.get_element((x-1),(y)) != m.get_element((x+1),(y)))
-            next_dir = (dx, -dy)
-            next_pos = (x + dx, y - dy)
-            return True, 'reflect', next_pos, next_dir
+
         
         # when laser meets reflect block, A
         elif m.get_element(x+dx,y+dy) == 'A':
@@ -667,25 +755,42 @@ def laser_1_step(matrix, laser_pos, laser_dir):
     elif x-1 < 0 :
         
         # Is the Laser on the left or right edge of a block and is it trying to go to a reflect wall through itself.
-        if m.get_element(x+dx,y+dy) == 'A' and m.get_element(x,(y+1)) != 'o' and m.get_element(x,(y-1)) != 'o' and  m.get_element((x+dx),(y)=='A'): 
-            # print('help-1')
+        if m.get_element(x+dx,y+dy) == 'A' and m.get_element(x,(y+1)) != 'o' and m.get_element(x,(y-1)) != 'o' and  m.get_element((x+dx),(y))=='A': 
             next_dir = (0, 0)
             next_pos = (x - 0, y + 0)
             return True, 'stop', next_pos, next_dir
     
         
+        # Is the Laser on the left or right edge of a block and is it trying to go to a reflect wall NOT through itself.
+        elif m.get_element(x+dx,y+dy) == 'A' and m.get_element(x,(y+1)) != 'o' and m.get_element(x,(y-1)) != 'o' and  m.get_element((x+dx),(y)!='A'): 
+            m.set_color(x+dx, y+dy, '41')
+            side = laser_contact_side(matrix, laser_pos, laser_dir)
+            if side == 'top' or side == 'down':
+                next_dir = (dx, -dy)
+            if side == 'left' or side == 'right':
+                next_dir = (-dx, dy)
+            return True, 'reflect', next_pos, next_dir
         
-        
-        
-    
-        # Is the Laser on the left or right edge of a block and is it trying to go through an opaque block
-        elif (m.get_element(x,(y+1)) != 'o' and m.get_element(x,(y-1)) != 'o' and m.get_element(x+dx,y+dy)) == 'B' and m.get_element((x),(y+1)) ==m.get_element((x),(y-1)): 
+        # Is the Laser on the left or right edge of a block and is it trying to go to an opaque block through itself
+        elif m.get_element(x+dx,y+dy) == 'B' and (m.get_element(x,(y+1)) == 'A' or m.get_element(x,(y+1)) == 'B') and (m.get_element(x,(y-1)) == 'A' or m.get_element(x,(y-1)) == 'B') and  m.get_element((x+dx),(y))=='B': 
             # print('help-5')
             next_dir = (0, 0)
             next_pos = (x - 0, y + 0)
             return True, 'stop', next_pos, next_dir
          
+        
+        
+        # Is the Laser on the left or right edge of a block and is it trying to go to a opaque wall NOT through itself.
+        elif m.get_element(x+dx,y+dy) == 'B' and (m.get_element(x,(y+1)) == 'A' or m.get_element(x,(y+1)) == 'B') and (m.get_element(x,(y-1)) == 'A' or m.get_element(x,(y-1)) == 'B') and  m.get_element((x+dx),(y)!='B'): 
+            
+            m.set_color(x+dx, y+dy, '41')
+            next_dir =(0, 0)
+            return True, 'stop', next_pos, next_dir, new_dir
+    
 
+        
+        
+    
     
         # Is the Laser on the left or right edge of a block and is it trying to go through a refract block
         elif (m.get_element(x,(y+1)) != 'o' and m.get_element(x,(y-1)) != 'o' and m.get_element(x+dx,y+dy)) == 'C' and m.get_element((x),(y+1)) ==m.get_element((x),(y-1)): 
@@ -702,12 +807,6 @@ def laser_1_step(matrix, laser_pos, laser_dir):
             og_pos = (x+dx,y+dy)
             return True, 'retract', next_pos, next_dir, new_dir, og_pos  
             
-        # Is the Laser on the left or right edge of a block and is it trying to go to a reflect wall NOT through itself.
-        elif m.get_element(x+dx,y+dy) == 'A' and m.get_element(x,(y+1)) != 'o' and m.get_element(x,(y-1)) != 'o' and  m.get_element((x+dx),(y)!='A'): 
-            # print('help-3')
-            next_dir = (-dx, dy)
-            next_pos = (x - dx, y + dy)
-            return True, 'reflect', next_pos, next_dir
         
         # when laser meets reflect block, A
         elif m.get_element(x+dx,y+dy) == 'A':
@@ -748,7 +847,7 @@ def laser_1_step(matrix, laser_pos, laser_dir):
     elif x+1 == m.max_column() :
         
         # Is the Laser on the left or right edge of a block and is it trying to go to a reflect wall through itself.
-        if m.get_element(x+dx,y+dy) == 'A' and m.get_element(x,(y+1)) != 'o' and m.get_element(x,(y-1)) != 'o' and  m.get_element((x+dx),(y)=='A'): 
+        if m.get_element(x+dx,y+dy) == 'A' and m.get_element(x,(y+1)) != 'o' and m.get_element(x,(y-1)) != 'o' and  m.get_element((x+dx),(y))=='A': 
             # print('help-1')
             next_dir = (0, 0)
             next_pos = (x - 0, y + 0)
@@ -756,15 +855,40 @@ def laser_1_step(matrix, laser_pos, laser_dir):
     
         
         
+        # Is the Laser on the left or right edge of a block and is it trying to go to a reflect wall NOT through itself.
+        elif m.get_element(x+dx,y+dy) == 'A' and m.get_element(x,(y+1)) != 'o' and m.get_element(x,(y-1)) != 'o' and  m.get_element((x+dx),(y)!='A'): 
+            # print('help-3')
+            m.set_color(x+dx, y+dy, '41')
+            side = laser_contact_side(matrix, laser_pos, laser_dir)
+            # print(side)
+            if side == 'top' or side == 'down':
+                next_dir = (dx, -dy)
+            if side == 'left' or side == 'right':
+                next_dir = (-dx, dy)
+            # print(next_pos, next_dir)
+            return True, 'reflect', next_pos, next_dir
+            # next_dir = (-dx, dy)
+            # next_pos = (x + dx, y + dy)
         
         
     
-        # Is the Laser on the left or right edge of a block and is it trying to go through an opaque block
-        elif (m.get_element(x,(y+1)) != 'o' and m.get_element(x,(y-1)) != 'o' and m.get_element(x+dx,y+dy)) == 'B' and m.get_element((x),(y+1)) ==m.get_element((x),(y-1)): 
+        # Is the Laser on the left or right edge of a block and is it trying to go to an opaque block through itself
+        elif m.get_element(x+dx,y+dy) == 'B' and (m.get_element(x,(y+1)) == 'A' or m.get_element(x,(y+1)) == 'B') and (m.get_element(x,(y-1)) == 'A' or m.get_element(x,(y-1)) == 'B') and  m.get_element((x+dx),(y))=='B': 
             # print('help-5')
             next_dir = (0, 0)
             next_pos = (x - 0, y + 0)
             return True, 'stop', next_pos, next_dir
+        
+        
+        
+        
+        # Is the Laser on the left or right edge of a block and is it trying to go to a opaque wall NOT through itself.
+        elif m.get_element(x+dx,y+dy) == 'B' and (m.get_element(x,(y+1)) == 'A' or m.get_element(x,(y+1)) == 'B') and (m.get_element(x,(y-1)) == 'A' or m.get_element(x,(y-1)) == 'B') and  m.get_element((x+dx),(y)!='B'): 
+            
+            m.set_color(x+dx, y+dy, '41')
+            next_dir =(0, 0)
+            return True, 'stop', next_pos, next_dir, new_dir
+    
          
 
     
@@ -783,12 +907,7 @@ def laser_1_step(matrix, laser_pos, laser_dir):
             og_pos = (x+dx,y+dy)
             return True, 'retract', next_pos, next_dir, new_dir, og_pos  
             
-        # Is the Laser on the left or right edge of a block and is it trying to go to a reflect wall NOT through itself.
-        elif m.get_element(x+dx,y+dy) == 'A' and m.get_element(x,(y+1)) != 'o' and m.get_element(x,(y-1)) != 'o' and  m.get_element((x+dx),(y)!='A'): 
-            # print('help-3')
-            next_dir = (-dx, dy)
-            next_pos = (x - dx, y + dy)
-            return True, 'reflect', next_pos, next_dir
+            # return True, 'reflect', next_pos, next_dir
         
         # when laser meets reflect block, A
         elif m.get_element(x+dx,y+dy) == 'A':
@@ -829,7 +948,7 @@ def laser_1_step(matrix, laser_pos, laser_dir):
     
     # when laser meets reflect block, A
     elif m.get_element(x+dx,y+dy) == 'A':
-            print("hehehe")
+            # print("hehehe")
             m.set_color(x+dx, y+dy, '41')
             side = laser_contact_side(matrix, laser_pos, laser_dir)
         
@@ -847,7 +966,7 @@ def laser_1_step(matrix, laser_pos, laser_dir):
     
     # when laser meets refract block, C
     elif m.get_element(x+dx, y+dy) == 'C':
-        print('re')
+        # print('re')
         m.set_color(x+dx, y+dy, '41')
         if m.get_element(x, y) == 'C':
             next_dir = laser_dir
@@ -944,7 +1063,7 @@ def get_board_permutations(board, num_of_A, num_of_B, num_of_C):
     '''
     Takes in a 2D-Matrix of the board, the number of A blocks, the number of B blocks, and the number of C blocks
     
-    Returns an array with each element containing set of tuples in the form of (blockType, x-coordinate, y-coordinate) for each added block
+    Returns an array with each element containing set of tuples in the form of (blockType, x-coordinate, y-coordinate) for each added block and the number of fixed blocks
     '''
     
     board_array = np.array(board)
@@ -957,11 +1076,18 @@ def get_board_permutations(board, num_of_A, num_of_B, num_of_C):
         for j in range((board_col)):
             if board_array[i][j] != "o":
                 fixed_blocks.add((j,i))
-                print("Fixed: ", board_array[i][j], (j,i))            
+                # print("Fixed: ", board_array[i][j], (j,i))            
 
-    
+    fixed_count = len(fixed_blocks)
     flattened_board_array = board_array.flatten()
-
+    fixed_flattened_arr = []
+    for i in range(len(flattened_board_array)):
+        if flattened_board_array[i] != 'o':
+            fixed_flattened_arr.append((flattened_board_array[i],i))
+        
+    # print(flattened_board_array)
+    # print(fixed_flattened_arr)
+    
     ##Delete fixed elements from flattened array
     new_flat = np.delete(flattened_board_array, np.where((flattened_board_array !='o')))
 
@@ -1009,22 +1135,28 @@ def get_board_permutations(board, num_of_A, num_of_B, num_of_C):
             else:
                 restored_board_permutation.append(flattened_board_array[i])
                 fixed_index_count+=1
+                
+        # if (test_me):
+        #     print(board_rows, board_col)
+        #     print(restored_board_permutation)
         
     #Find the board matrix coordinates of the added blocks and add it to a set containing the type   
         added_blocks_set = []
         for i in range(len(restored_board_permutation)):
             block_type = restored_board_permutation[i]
-            row_num = i // board_rows
-            col_num = i % board_rows
-            if block_type != 'o' and (col_num, row_num) not in fixed_blocks:
-                added_blocks_set.append((block_type, row_num, col_num))
-            if test_me and block_type != 'o':
-                print((block_type, row_num, col_num))
+            row_num = i // board_col
+            col_num = i % board_col
+            
+            # print(row_num,col_num)
+            if block_type != 'o' and (row_num, col_num) not in fixed_blocks:
+                added_blocks_set.append((block_type, col_num, row_num))
+                # if test_me:
+                #     print((block_type, row_num, col_num))
                 
         added_blocks_permutations.append(added_blocks_set)
         test_me = False
     
-    return added_blocks_permutations
+    return added_blocks_permutations, fixed_count
 
 def rebuild_matrix(original_board, added_block_set):
     
@@ -1182,16 +1314,20 @@ if __name__ == "__main__":
     num_B_blocks = Original_Board.get_B_Blocks()
     num_C_blocks = Original_Board.get_C_Blocks()
     
-    board_permutations = get_board_permutations(board,num_A_blocks,num_B_blocks,num_C_blocks)
+    board_permutations, fixed_count= get_board_permutations(board,num_A_blocks,num_B_blocks,num_C_blocks)
+    
     total_permutations = len(board_permutations)
-    print(total_permutations)
+    # print(total_permutations)
     board_permutations_index = 0
     true_path_index = 0
     Does_Laser_Hit_Targets = False
     
-    # while Does_Laser_Hit_Targets != True:
+    m = Matrix(matrix_width,matrix_height)
+    m.print_matrix_with_indices()
     
-    for i in range(0,1,1):
+    while Does_Laser_Hit_Targets != True:
+    
+    # for i in range(0,1,1):
         
         Board1 = Board(board, A, B, C, lasers, laser_dir, points)
         print(board_permutations_index)
@@ -1203,7 +1339,7 @@ if __name__ == "__main__":
         new_board = rebuild_matrix(board,board_permutations[board_permutations_index])
         # print(board)
         # print("test")
-        print(new_board)
+        # print(new_board)
         
         target_list = copy.copy(Board1.get_points())
         laser_list = copy.copy(Board1.get_Lasers())
@@ -1223,7 +1359,6 @@ if __name__ == "__main__":
         set_reflect(m,reflect_list)
         set_opaque(m,opaque_list)
         set_refract(m,refract_list)
-        m.print_matrix_with_indices()
         # print('here')
         length_of_laser_list = len(laser_list)
         index = 0
@@ -1235,8 +1370,8 @@ if __name__ == "__main__":
             interaction = laser_1_step(m,current_pos, laser_direction)
             interaction_len = 0
             validate = bool()
-            print("outer")
-            print(interaction)
+            # print("outer")
+            # print(interaction)
             if type(interaction) != bool:
                     interaction_len = len(interaction)
 
@@ -1259,7 +1394,7 @@ if __name__ == "__main__":
                     new_dir = interaction [4]
                     og_pos = interaction[5]
                     #Create a new laser and add it to the list
-                    print(new_pos, next_dir)
+                    # print(new_pos, next_dir)
                     # print("I am creating a new laser starting at ", og_pos, "going in ", new_dir)
                     laser_list.append(og_pos)
                     laser_dir_list.append(new_dir)
@@ -1311,25 +1446,36 @@ if __name__ == "__main__":
             index += 1
         target_list_set = set(target_list)    
         laser_path_set = set(m.get_colored_array())
-        print("Targets: ", target_list_set)
-        print("Laser Path: ", laser_path_set)
-        if target_list_set.issubset(laser_path_set):
-            Does_Laser_Hit_Targets = True
-            true_path_index = board_permutations_index
+        # print("Targets: ", target_list_set)
+        # print("Laser Path: ", laser_path_set)
+        if target_list_set.issubset(laser_path_set) :
+            placed_count = 0
+            for items in board_permutations[board_permutations_index]:
+                if items[0] != 'x':
+                    placed_count += 1
+                        
+                total_allowed_to_be_placed = num_A_blocks+num_B_blocks+num_C_blocks
+                # print(total_allowed_to_be_placed, placed_count)
+                if placed_count - fixed_count >= total_allowed_to_be_placed:
+                    Does_Laser_Hit_Targets = True
+                    true_path_index = board_permutations_index
 
         if (board_permutations_index == total_permutations):
             Does_Laser_Hit_Targets = True
+            
+
         board_permutations_index+=1
         
     
-        
+
+        # m.print_matrix_with_indices()
         # print(laser_list)
         
+    if(Does_Laser_Hit_Targets):
+        print("You want to place the blocks in the following position: ", board_permutations[true_path_index])
+        print("This placement should yield the correct solution")
+        print(rebuild_matrix(board,board_permutations[true_path_index]))
         m.print_matrix_with_indices()
-        
-    print("You want to place the blocks in the following position: ", board_permutations[true_path_index])
-    print("This placement should yield the correct solution")
-    print(rebuild_matrix(board,board_permutations[true_path_index]))
     
         
 
