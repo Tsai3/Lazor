@@ -476,26 +476,7 @@ def get_All_Refract_Walls(board):
     return list(set(refract_walls))
 
 
-if __name__ == "__main__":
-    #Create a board object
-    board, A, B, C, lasers, points = read_board('mad_1.bff')
-    Board1 = Board(board,A,B,C,lasers,points)
 
-    
-    print(Board1.get_Board_Matrix())
-    print(Board1.get_A_Blocks())
-    print(Board1.get_B_Blocks())
-    print(Board1.get_C_Blocks())
-    print(Board1.get_Lasers())
-    print(Board1.get_points())
-    
-    
-    Board1.add_Lazor(0,0,1,1)
-    print(Board1.get_Lasers())
-    
-
-    
-    
 
         
   
