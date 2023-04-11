@@ -44,7 +44,6 @@ if __name__ == "__main__":
     untouched_blocks = []   
     
     while Does_Laser_Hit_Targets != True:
-        
         Board1 = Board(board, A, B, C, lasers, laser_dir, points)
         placed_count = 0
         total_allowed_to_be_placed = num_A_blocks+num_B_blocks+num_C_blocks       
@@ -152,9 +151,13 @@ if __name__ == "__main__":
         
         this_iteration_overlap = len(list(laser_path_set.intersection(target_list_set)))
         
+        if target_list_set.issubset(laser_path_set) :
+            Does_Laser_Hit_Targets = True
+            true_path_index = board_permutations_index
         
         if (board_permutations_index == total_permutations):
             Does_Laser_Hit_Targets = True
+            
             
         board_permutations_index+=1
 
