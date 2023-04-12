@@ -4,7 +4,9 @@ from sympy.utilities.iterables import multiset_permutations
 
 class Block:
     '''
-    This class carries creates a Block objecct.
+    This class carries creates a Block object.
+    
+    It has attributes for each loacation of the walls, it's type, and it's position in the board matrix
    
     '''
 
@@ -42,7 +44,9 @@ class Block:
 
 class Board:
     '''
-    This class carries creates a Board objecct.
+    This class carries creates a Board object.
+    
+    This class contains attributes of the 2D board matrix, a list of A, B, and C Blocks, a list of lasers, their directions, and points.
    
     '''
     
@@ -288,7 +292,6 @@ def laser_contact_side(matrix, laser_pos, laser_dir):
     if nx-1 < 0  or nx + 1 >= (m.max_column())  or ny-1 < 0 or  ny + 1 >= (m.max_row()):
         look_at_Near_Walls = False
     
-    # print("Walls: ", look_at_Near_Walls, look_at_Far_Walls)
 
     if look_at_Far_Walls == False and look_at_Near_Walls == False:
         side = 'top'
@@ -355,10 +358,7 @@ def laser_1_step(matrix, laser_pos, laser_dir):
     nls_dx = int()
     nls_dy = int()
     new_dir=(nls_dx, nls_dy)
-    # print(x,y)
-    # print(next_pos)
-    # print(y+1, y+1 < 9)
-    # print(m.max_row(), m.max_column())
+
     
     #check if next_position is in matrix
     if next_pos[0] <0 or next_pos[0] > (m.max_column()-1) or next_pos[1] <0 or next_pos[1] > (m.max_row()-1):
@@ -377,86 +377,59 @@ def laser_1_step(matrix, laser_pos, laser_dir):
     elif x-1 >= 0 and x+1 < (m.max_column()) and y -1 >=0 and y+1 < (m.max_row()) and x-dx >= 0 and x+dx < (m.max_column()) and y -dy >=0 and y+dy < (m.max_row()):
         # Is literally everywhere around me a relect block or opaque block
         if  (m.get_element(x+dx,y+dy) == 'A') and (m.get_element(x,(y+1)) == 'A' or m.get_element(x,(y+1)) == 'B') and (m.get_element(x,(y-1)) == 'A' or m.get_element(x,(y-1)) == 'B') and (m.get_element((x+1),(y)) =="A" or m.get_element((x+1),(y)) =="B") and (m.get_element((x-1),(y)) == 'A' or m.get_element((x-1),(y)) == 'B'): 
-            # print('help-0')
             next_dir = (0, 0)
             next_pos = (x + 0, y + 0)
             return True, 'stop', next_pos, next_dir
         
         # Is the Laser on the left or right edge of a block and is it trying to go to a reflect wall through itself.
         elif m.get_element(x+dx,y+dy) == 'A' and (m.get_element(x,(y+1)) == 'A' or m.get_element(x,(y+1)) == 'B') and (m.get_element(x,(y-1)) == 'A' or m.get_element(x,(y-1)) == 'B') and  m.get_element((x+dx),(y))=='A': 
-            # print('help-1')
-            # print(dx)
-            # print(m.get_element((x+dx),(y)))
-            # print('huh')
-            # print((m.get_element(x,(y+1)) == 'A' or m.get_element(x,(y+1)) == 'B')) #this is true
             next_dir = (-dx, dy)
-            # print(next_dir)
-            # print(x,y)
             next_pos = (x - dx, y + dy)
-            # print(next_pos)
             return True, 'reflect', next_pos, next_dir 
     
         # Is the Laser on the top or bottom edge of a block and is it trying to go to a reflect wall through itself.
         elif m.get_element(x+dx,y+dy) == 'A' and (m.get_element((x+1),(y)) =="A" or m.get_element((x+1),(y)) =="B") and (m.get_element((x-1),(y)) == 'A' or m.get_element((x-1),(y)) == 'B') and m.get_element((x),(y+dy)) == 'A': 
-            # print('help-2')
-            # print(m.get_element((x),(y+dy)))
-            # print((x,y),(dx,dy))
-            # print(m.get_element((x-1),(y)) != m.get_element((x+1),(y)))
+
             next_dir = (dx, -dy)
             next_pos = (x + dx, y - dy)
             return True, 'reflect', next_pos, next_dir
         
         # Is the Laser on the left or right edge of a block and is it trying to go to a reflect wall NOT through itself.
         elif m.get_element(x+dx,y+dy) == 'A' and (m.get_element(x,(y+1)) == 'A' or m.get_element(x,(y+1)) == 'B') and (m.get_element(x,(y-1)) == 'A' or m.get_element(x,(y-1)) == 'B') and  m.get_element((x+dx),(y)!='A'): 
-            # print('help-3')
-            
+
             m.set_color(x+dx, y+dy, '41')
             side = laser_contact_side(matrix, laser_pos, laser_dir)
-            # print(side)
             if side == 'top' or side == 'down':
                 next_dir = (dx, -dy)
             if side == 'left' or side == 'right':
                 next_dir = (-dx, dy)
-            # print(next_pos, next_dir)
             return True, 'reflect', next_pos, next_dir
-            
-            # next_dir = (-dx, dy)
-            # next_pos = (x + dx, y + dy)
-            # return True, 'reflect', next_pos, next_dir
-    
+
         # Is the Laser on the top or bottom edge of a block and is it trying to go to a reflect wall NOT through itself.
         elif m.get_element(x+dx,y+dy) == 'A' and (m.get_element((x+1),(y)) =="A" or m.get_element((x+1),(y)) =="B") and (m.get_element((x-1),(y)) == 'A' or m.get_element((x-1),(y)) == 'B') and m.get_element((x),(y+dy)) != 'A': 
-            # print('help-4')
+            
             
             m.set_color(x+dx, y+dy, '41')
             side = laser_contact_side(matrix, laser_pos, laser_dir)
-            # print(side)
             if side == 'top' or side == 'down':
                 next_dir = (dx, -dy)
             if side == 'left' or side == 'right':
                 next_dir = (-dx, dy)
-            # print(next_pos, next_dir)
             return True, 'reflect', next_pos, next_dir
             
-            # # print(m.get_element((x-1),(y)) != m.get_element((x+1),(y)))
-            # next_dir = (dx, -dy)
-            # next_pos = (x + dx, y + dy)
-            # return True, 'reflect', next_pos, next_dir
-        
+
         
         
     
         # Is the Laser on the left or right edge of a block and is it trying to go to an opaque block through itself
         elif m.get_element(x+dx,y+dy) == 'B' and (m.get_element(x,(y+1)) == 'A' or m.get_element(x,(y+1)) == 'B') and (m.get_element(x,(y-1)) == 'A' or m.get_element(x,(y-1)) == 'B') and  m.get_element((x+dx),(y))=='B': 
-            # print('help-5')
             next_dir = (0, 0)
             next_pos = (x - 0, y + 0)
             return True, 'stop', next_pos, next_dir
          
         # Is the Laser on the top or bottom edge of a block and is it trying to go to an opaque block through itself
-        elif m.get_element(x+dx,y+dy) == 'B' and (m.get_element((x+1),(y)) =="A" or m.get_element((x+1),(y)) =="B") and (m.get_element((x-1),(y)) == 'A' or m.get_element((x-1),(y)) == 'B') and m.get_element((x),(y+dy)) == 'B': 
-            # print('help-6')
         
+        elif m.get_element(x+dx,y+dy) == 'B' and (m.get_element((x+1),(y)) =="A" or m.get_element((x+1),(y)) =="B") and (m.get_element((x-1),(y)) == 'A' or m.get_element((x-1),(y)) == 'B') and m.get_element((x),(y+dy)) == 'B':         
             next_dir = (0, 0)
             next_pos = (x + 0, y - 0)
             return True, 'stop', next_pos, next_dir
@@ -465,7 +438,6 @@ def laser_1_step(matrix, laser_pos, laser_dir):
         
         # Is the Laser on the left or right edge of a block and is it trying to go to a opaque wall NOT through itself.
         elif m.get_element(x+dx,y+dy) == 'B' and (m.get_element(x,(y+1)) == 'A' or m.get_element(x,(y+1)) == 'B') and (m.get_element(x,(y-1)) == 'A' or m.get_element(x,(y-1)) == 'B') and  m.get_element((x+dx),(y)!='B'): 
-            
             m.set_color(x+dx, y+dy, '41')
             next_dir =(0, 0)
             return True, 'stop', next_pos, next_dir, new_dir
@@ -966,7 +938,6 @@ def laser_1_step(matrix, laser_pos, laser_dir):
     
     # when laser meets refract block, C
     elif m.get_element(x+dx, y+dy) == 'C':
-        # print('re')
         m.set_color(x+dx, y+dy, '41')
         if m.get_element(x, y) == 'C':
             next_dir = laser_dir
@@ -983,6 +954,15 @@ def laser_1_step(matrix, laser_pos, laser_dir):
 
 
 def read_board(string):
+    """ Takes in the filename of a bff file and translates it into a tuple
+
+    Args:
+        string (str): name of file. Format must be "name.bff"
+
+    Returns:
+        tuple: board_matrix array, a list of each type of useable block, a list of the lasers, their respective directions, and the target points
+    """
+    
     file = open(string, 'r')
     lines = file.readlines()
     
@@ -1059,24 +1039,25 @@ def read_board(string):
       
     return board_matrix_array, A_blocks, B_blocks, C_blocks, lasers_arr, lasers_dir_arr, points_arr
 
-def get_board_permutations(board, num_of_A, num_of_B, num_of_C):
+def get_board_permutations(board, num_of_A, num_of_B, num_of_C, lasers, lasers_direction_list, targets):
     '''
-    Takes in a 2D-Matrix of the board, the number of A blocks, the number of B blocks, and the number of C blocks
+    Takes in a 2D-Matrix of the board, the number of A blocks, the number of B blocks, and the number of C blocks and lists of lasers and targets
     
     Returns an array with each element containing set of tuples in the form of (blockType, x-coordinate, y-coordinate) for each added block and the number of fixed blocks
     '''
     
+    
     board_array = np.array(board)
     board_rows, board_col = board_array.shape
-
-    ##Get Fixed Block Locations and x Locations
+    
+    ## Get Fixed Block Locations and x Locations
+    
     fixed_blocks = set()
    
     for i in range((board_rows)):
         for j in range((board_col)):
             if board_array[i][j] != "o":
                 fixed_blocks.add((j,i))
-                # print("Fixed: ", board_array[i][j], (j,i))            
 
     fixed_count = len(fixed_blocks)
     flattened_board_array = board_array.flatten()
@@ -1085,21 +1066,20 @@ def get_board_permutations(board, num_of_A, num_of_B, num_of_C):
         if flattened_board_array[i] != 'o':
             fixed_flattened_arr.append((flattened_board_array[i],i))
         
-    # print(flattened_board_array)
-    # print(fixed_flattened_arr)
-    
-    ##Delete fixed elements from flattened array
+
+    ## Delete fixed elements from flattened array
     new_flat = np.delete(flattened_board_array, np.where((flattened_board_array !='o')))
 
-    ##Count number of useable Blocks
+    ## Count number of useable Blocks
 
     total_number_of_blocks = num_of_A + num_of_B + num_of_C
+    
     
     A_blocks = []
     B_blocks = []
     C_blocks = []
 
-    ##Create instances of A, B, and C to be added to board
+    ## Create instances of A, B, and C to be added to board
     for i in range(num_of_A):
         A_blocks.append('A')
     for i in range(num_of_B):
@@ -1109,7 +1089,7 @@ def get_board_permutations(board, num_of_A, num_of_B, num_of_C):
     
    
     
-    ##Delete o's from flattened array and replace them with the instances of A, B, and C
+    ## Delete o's from flattened array and replace them with the instances of A, B, and C
     for i in range(total_number_of_blocks):
         new_flat = np.delete(new_flat,0)
         
@@ -1117,12 +1097,180 @@ def get_board_permutations(board, num_of_A, num_of_B, num_of_C):
     all_arrs = (A_blocks,B_blocks,C_blocks, new_flat)
     flattened_with_blocks = np.concatenate(all_arrs)
     
-    
-    #Create Array of all Possible Board Permutations    
+    # Create Array of all Possible Board Permutations    
     added_blocks_permutations = []
     flattened_permutations = multiset_permutations(flattened_with_blocks)
     
-    test_me = True
+ # ------------------------------------------------------------------------------------------------------------------#
+                            # Filtering Starts #
+ # ------------------------------------------------------------------------------------------------------------------#  
+    ## Create set of impossible block combinations -- Combinations where the laser or targets are trapped by walls horizontally ##
+    
+
+    
+    impossible_set = set()
+    
+    
+    
+    for element in lasers:
+        # print(element)
+
+        laser_x, laser_y = element
+        
+        # Leftmost Wall
+        if laser_x == 0:
+            impossible_set.add(('A', 0, 0)) #Y-pos doesnt matter
+            impossible_set.add(('B', 0, 0)) #Y-pos doesnt matter
+        
+        # Rightmost Wall    
+        elif laser_x == board_col*2 :   
+            impossible_set.add(('A', board_col-1, 0)) #Y-pos doesnt matter
+            impossible_set.add(('B', board_col-1, 0)) #Y-pos doesnt matter
+        
+        # Topmost Wall
+        if laser_y == 0:
+            impossible_set.add(('A', 0, 0)) #X-pos doesnt matter
+            impossible_set.add(('B', 0, 0)) #X-pos doesnt matter
+        
+        # Bottommost Wall    
+        elif laser_y == board_rows*2 :   
+            impossible_set.add(('A', 0, board_rows-1)) #X-pos doesnt matter
+            impossible_set.add(('B', 0, board_col-1)) #X-pos doesnt matter
+            
+        else:
+        # If I'm trapped between two horizontal walls
+            if (laser_x % 2 == 0):
+                left_block_x = int((laser_x/2)-1) 
+                right_block_x = int((laser_x/2))
+                both_blocks_y = int((laser_y-1)/2)
+                impossible_set.add(('A',left_block_x,both_blocks_y))
+                impossible_set.add(('A',right_block_x,both_blocks_y))
+                impossible_set.add(('B',right_block_x,both_blocks_y))
+                impossible_set.add(('B',left_block_x,both_blocks_y))
+                
+        #If I'm Trapped between two vertical wall
+            if (laser_y % 2 == 0):    
+                top_block_y = int((laser_y/2)-1)  
+                bottom_block_y = int((laser_y/2))
+                both_block_x = int((laser_x - 1)/2)
+                impossible_set.add(('A',both_block_x,top_block_y))
+                impossible_set.add(('A',both_block_x,bottom_block_y))
+                impossible_set.add(('B',both_block_x,bottom_block_y))
+                impossible_set.add(('B',both_block_x,top_block_y))
+    
+            
+            
+            
+
+        
+    #Do the Same for Targets
+            
+    for element in targets:
+        # print(element)
+
+        laser_x, laser_y = element
+        
+        # Leftmost Wall
+        if laser_x == 0:
+            impossible_set.add(('A', 0, 0)) #Y-pos doesnt matter
+            impossible_set.add(('B', 0, 0)) #Y-pos doesnt matter
+        
+        # Rightmost Wall    
+        elif laser_x == board_col*2 :   
+            impossible_set.add(('A', board_col-1, 0)) #Y-pos doesnt matter
+            impossible_set.add(('B', board_col-1, 0)) #Y-pos doesnt matter
+        
+        # Topmost Wall
+        if laser_y == 0:
+            impossible_set.add(('A', 0, 0)) #X-pos doesnt matter
+            impossible_set.add(('B', 0, 0)) #X-pos doesnt matter
+        
+        # Bottommost Wall    
+        elif laser_y == board_rows*2 :   
+            impossible_set.add(('A', 0, board_rows-1)) #X-pos doesnt matter
+            impossible_set.add(('B', 0, board_col-1)) #X-pos doesnt matter
+            
+        else:
+        # If I'm trapped between two horizontal walls
+            if (laser_x % 2 == 0):
+                left_block_x = int((laser_x/2)-1) 
+                right_block_x = int(laser_x/2)
+                both_blocks_y = int((laser_y-1)/2)
+                impossible_set.add(('A',left_block_x,both_blocks_y))
+                impossible_set.add(('A',right_block_x,both_blocks_y))
+                impossible_set.add(('B',right_block_x,both_blocks_y))
+                impossible_set.add(('B',left_block_x,both_blocks_y))
+                
+        #If I'm Trapped between two vertical wall
+            if (laser_y % 2 == 0):    
+                top_block_y = int((laser_y/2)-1)  
+                bottom_block_y = int(laser_y/2)
+                both_block_x = int((laser_x - 1)/2)
+                impossible_set.add(('A',both_block_x,top_block_y))
+                impossible_set.add(('A',both_block_x,bottom_block_y))
+                impossible_set.add(('B',both_block_x,bottom_block_y))
+                impossible_set.add(('B',both_block_x,top_block_y))
+            
+            
+    
+    
+    forbidden_set = impossible_set
+    
+    # Per each laser, create a sets of block combinations that lead to straight laser paths. Put these sets in an array
+    
+    
+    needed_blocks_per_laser = []
+    print(matrix_height)
+    
+    ## Get Straight Laser Path Set per each laser ##
+    for i in range(len(laser_positions)):
+        
+        need_at_least_one_block_from_here = set() ## This is a set of the block combinations (e.g {(A, 0, 0), (A,1,0), (A,2,0)}
+        straight_laser_path = set() #This is a set of the laser Path (e.g {(2,1), (3,2), (4,3), etc})
+        
+        x, y = laser_positions[i]
+        dx, dy = lasers_direction_list[i]
+        print('Laser', i+1 , 'Path: ')
+        while (((x <= matrix_width) and (x >= 0)) and ((y <= matrix_height) and (y >= 0))):
+            print((x,y))
+            straight_laser_path.add((x,y))
+            x = x + dx
+            y = y + dy
+        print()
+        print('Laser Path as Set: ', straight_laser_path)
+        print()
+    
+    ## Get blocks that would cause walls there
+        
+        for element in straight_laser_path:
+            laser_x, laser_y = element
+            if (laser_x % 2 == 0 and laser_x!= matrix_width and laser_x !=0):
+                left_block_x = int((laser_x/2)-1) 
+                right_block_x = int(laser_x/2)
+                both_blocks_y = int((laser_y-1)/2)
+                need_at_least_one_block_from_here.add(('A',left_block_x,both_blocks_y))
+                need_at_least_one_block_from_here.add(('A',right_block_x,both_blocks_y))
+                need_at_least_one_block_from_here.add(('C',right_block_x,both_blocks_y))
+                need_at_least_one_block_from_here.add(('C',left_block_x,both_blocks_y))
+                
+            if (laser_y % 2 == 0 and laser_y != matrix_height and laser_y !=0):    
+                top_block_y = int((laser_y/2)-1)  
+                bottom_block_y = int(laser_y/2)
+                both_block_x = int((laser_x - 1)/2)
+                need_at_least_one_block_from_here.add(('A',both_block_x,top_block_y))
+                need_at_least_one_block_from_here.add(('A',both_block_x,bottom_block_y))
+                need_at_least_one_block_from_here.add(('C',both_block_x,bottom_block_y))
+                need_at_least_one_block_from_here.add(('C',both_block_x,top_block_y))
+        
+        # print()
+        # print(need_at_least_one_block_from_here)
+        # print(need_at_least_one_block_from_here)
+        needed_blocks_per_laser.append(need_at_least_one_block_from_here)
+    
+    for j in range(len(needed_blocks_per_laser)):
+        print('This is the set of blocks that Laser', j+1, 'need in its path. The laser must hit AT LEAST one of these')
+        print(needed_blocks_per_laser[j])
+        print()
     
     for board_perm in flattened_permutations:
     
@@ -1135,62 +1283,109 @@ def get_board_permutations(board, num_of_A, num_of_B, num_of_C):
             else:
                 restored_board_permutation.append(flattened_board_array[i])
                 fixed_index_count+=1
-                
-        # if (test_me):
-        #     print(board_rows, board_col)
-        #     print(restored_board_permutation)
+            
         
     #Find the board matrix coordinates of the added blocks and add it to a set containing the type   
         added_blocks_set = []
-        total_allowed_to_be_placed = num_A_blocks+num_B_blocks+num_C_blocks
+
+     
         
-        placed_count = 0
         
         for i in range(len(restored_board_permutation)):
-            
+    
             block_type = restored_board_permutation[i]
             row_num = i // board_col
             col_num = i % board_col
             
                 
-                
-            # print(row_num,col_num)
+         
+            
             
             if block_type != 'o' and (row_num, col_num) not in fixed_blocks:
-                    
-                added_blocks_set.append((block_type, col_num, row_num))
-        
-                if block_type != 'x':
-                    placed_count += 1
-        
-        # print(placed_count)
-        # if (placed_count- fixed_count >= total_allowed_to_be_placed) == True:
-        #     print(" ")  
-             
+                added_blocks_set.append((block_type, col_num, row_num)) 
                 
-                # if test_me:
-                #     print((block_type, row_num, col_num))
+
+        clean_list = []             
+        clean_boolean = True
+         
         
+        # print(added_blocks_set) ## array
+        for value in needed_blocks_per_laser:
+            if any(elem in value for elem in added_blocks_set) == False:
+                    clean_boolean = False
         
+        # Iterate through forbidden set and do the Impossible Tests
+        # for i in forbidden_set:    
         
-        # print(len(added_blocks_set))
-        # for items in added_blocks_set:
-        #     placed_count = 0
-        #     # print(placed_count - fixed_count, total_allowed_to_be_placed
-        #     if (placed_count - fixed_count >= total_allowed_to_be_placed) == True:
-        #                 print('Sad!')
-        
-        
-        added_blocks_permutations.append(added_blocks_set)
-                    
-        
-                
-        test_me = False
     
+        #     filtered_block_type, filter_x, filter_y = i 
+        #     left_block_of_current = ((filter_x)-1)
+        #     right_block_of_current = ((filter_x)+1)
+        #     top_block_of_current = (filter_y)-1
+        #     bottom_block_of_current = (filter_y)+1
+        
+        
+        
+        
+        
+        
+            # ## Left/Right Wall Filter ##
+            # if (filtered_block_type, filter_x) == (i[0],i[1]):
+            #     clean_boolean = False
+                
+            # ## Top/Bottom Wall Filter ##
+            # if (filtered_block_type, filter_y) == (i[0],i[2]):
+            #     clean_boolean = False
+    
+                
+                
+        # ## Horizontal Wall Trap Filter ##
+        # if(filtered_block_type,filter_x,filter_y) in added_blocks_set and ('A',left_block_of_current,filter_y) in  added_blocks_set:
+        #     clean_boolean = False
+        # if(filtered_block_type,filter_x,filter_y) in added_blocks_set and ('B',left_block_of_current,filter_y) in  added_blocks_set:
+        #     clean_boolean = False
+        
+        # if(filtered_block_type,filter_x,filter_y) in added_blocks_set and ('A',right_block_of_current,filter_y) in added_blocks_set:
+        #     clean_boolean = False
+        # if(filtered_block_type,filter_x,filter_y) in added_blocks_set and ('B',right_block_of_current,filter_y) in added_blocks_set:
+        #     clean_boolean = False
+       
+            
+        # ## Vertical Wall Trap Filter ##
+        # if(filtered_block_type,filter_x,filter_y) in added_blocks_set and ('A',filter_x, top_block_of_current) in  added_blocks_set:
+        #     clean_boolean = False
+        # if(filtered_block_type,filter_x,filter_y) in added_blocks_set and ('B',filter_x, top_block_of_current) in  added_blocks_set:
+        #     clean_boolean = False
+       
+        
+        # if(filtered_block_type,filter_x,filter_y) in added_blocks_set and ('A',filter_x,bottom_block_of_current) in  added_blocks_set:
+        #     clean_boolean = False
+        # if(filtered_block_type,filter_x,filter_y) in added_blocks_set and ('B',filter_x,bottom_block_of_current) in  added_blocks_set:
+        #     clean_boolean = False
+        
+        
+  
+        
+        
+                
+        
+        if clean_boolean:
+            clean_list.append(added_blocks_set)            
+            added_blocks_permutations.append(clean_list[0])     
+                
+    # print(added_blocks_permutations[1])
     return added_blocks_permutations, fixed_count
 
 def rebuild_matrix(original_board, added_block_set):
-    
+    """This function creates a new 2D board array with blocks from an added block set array
+
+    Args:
+        original_board (2D array): the original empty 2D matrix array
+        added_block_set (tuple): (block_type, block x-position, block y-position)
+
+    Returns:
+        new board matrix (2D array)
+    """
     board_array = np.array(original_board)
     board_rows, board_col = board_array.shape
     
@@ -1201,12 +1396,19 @@ def rebuild_matrix(original_board, added_block_set):
         added_type = i[0]
         added_x = i[2]
         added_y = i[1]
-        new_board_matrix[added_x][added_y] = added_type
+        new_board_matrix[int(added_x)][added_y] = added_type
             
     
     return new_board_matrix
 
 def get_All_Left_Walls(board):
+    """
+    This function takes our 2D Board Matrix and extracts all the left wall Points in Matrix Co-Ordinates
+    Args:
+        board (2D-Array)
+    Returns:
+        list: array of left wall points
+    """
     left_walls_arr = []
     board_array = np.array(board)
     board_rows, board_col = board_array.shape
@@ -1223,6 +1425,13 @@ def get_All_Left_Walls(board):
     return left_walls_arr
 
 def get_All_Right_Walls(board):
+    """
+    This function takes our 2D Board Matrix and extracts all the right wall Points in Matrix Co-Ordinates
+    Args:
+        board (2D-Array)
+    Returns:
+        list: array of right wall points
+    """
     right_walls_arr = []
     board_array = np.array(board)
     board_rows, board_col = board_array.shape
@@ -1240,6 +1449,13 @@ def get_All_Right_Walls(board):
     return right_walls_arr
 
 def get_All_Top_Walls(board):
+    """
+    This function takes our 2D Board Matrix and extracts all the top wall Points in Matrix Co-Ordinates
+    Args:
+        board (2D-Array)
+    Returns:
+        list: array of top wall points
+    """
     top_walls_arr = []
     board_array = np.array(board)
     board_rows, board_col = board_array.shape
@@ -1257,6 +1473,13 @@ def get_All_Top_Walls(board):
     return top_walls_arr
 
 def get_All_Bottom_Walls(board):
+    """
+    This function takes our 2D Board Matrix and extracts all the bottom wall Points in Matrix Co-Ordinates
+    Args:
+        board (2D-Array)
+    Returns:
+        list: array of bottom wall points
+    """
     bottom_walls_arr = []
     board_array = np.array(board)
     board_rows, board_col = board_array.shape
@@ -1274,6 +1497,13 @@ def get_All_Bottom_Walls(board):
     return bottom_walls_arr
 
 def get_All_Centers(board):
+    """
+    This function takes our 2D Board Matrix and extracts all the Center Points in Matrix Co-Ordinates
+    Args:
+        board (2D-Array)
+    Returns:
+        list: array of center points
+    """
     centers_arr = []
     board_array = np.array(board)
     board_rows, board_col = board_array.shape
@@ -1291,6 +1521,13 @@ def get_All_Centers(board):
     return centers_arr
 
 def get_All_Walls(board):
+    """
+    This function takes our 2D Board Matrix and extracts all the  Walls in Matrix Co-Ordinates
+    Args:
+        board (2D-Array)
+    Returns:
+        array: array of Walls
+    """
     np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
     Top_walls = get_All_Top_Walls(board)
     Bottom_walls = get_All_Bottom_Walls(board)
@@ -1303,6 +1540,13 @@ def get_All_Walls(board):
     return walls_arr
 
 def get_All_Reflect_Walls(board):
+    """
+    This function takes our 2D Board Matrix and extracts all the Reflecting Walls in Matrix Co-Ordinates
+    Args:
+        board (2D-Array)
+    Returns:
+        set: set of Reflect Walls
+    """
     reflect_walls = []
     all_walls = get_All_Walls(board)
     for i in range(len(all_walls)):
@@ -1313,6 +1557,13 @@ def get_All_Reflect_Walls(board):
     return list(set(reflect_walls))
 
 def get_All_Opaque_Walls(board):
+    """
+    This function takes our 2D Board Matrix and extracts all the Opaque Walls in Matrix Co-Ordinates
+    Args:
+        board (2D-Array)
+    Returns:
+        set: set of Opaque Walls
+    """
     opaque_walls = []
     all_walls = get_All_Walls(board)
     for i in range(len(all_walls)):
@@ -1323,6 +1574,13 @@ def get_All_Opaque_Walls(board):
     return list(set(opaque_walls))
 
 def get_All_Refract_Walls(board):
+    """
+    This function takes our 2D Board Matrix and extracts all the Refracting Walls in Matrix Co-Ordinates
+    Args:
+        board (2D-Array)
+    Returns:
+        set: set of Refract Walls
+    """
     refract_walls = []
     all_walls = get_All_Walls(board)
     for i in range(len(all_walls)):
@@ -1333,9 +1591,11 @@ def get_All_Refract_Walls(board):
     return list(set(refract_walls))
 
 if __name__ == "__main__":
+    
     #Create a fixed set of all the intersection point
-    board, A, B, C, lasers, laser_dir, points = read_board('mad_1.bff')
+    board, A, B, C, lasers, laser_dir, points = read_board('mad_7.bff')
     Original_Board = Board(board, A, B, C, lasers, laser_dir, points)
+    print("Original Board: ")
     print(board)
     board_height, board_width = board.shape
     matrix_height = board_height*2 + 1
@@ -1345,69 +1605,63 @@ if __name__ == "__main__":
     num_B_blocks = Original_Board.get_B_Blocks()
     num_C_blocks = Original_Board.get_C_Blocks()
     
-    board_permutations, fixed_count= get_board_permutations(board,num_A_blocks,num_B_blocks,num_C_blocks)
+    laser_positions = Original_Board.get_Lasers()
+    laser_directions = Original_Board.get_Lasers_dir()
+    targets = Original_Board.get_points()
     
+    board_permutations, fixed_count= get_board_permutations(board,num_A_blocks,num_B_blocks,num_C_blocks, laser_positions, laser_directions, targets) 
+    
+    ## Start Fix Here ##
+    ## Fix get_board_permutations
     
     
     total_permutations = len(board_permutations)
-    print(total_permutations)
+    print("There are ",total_permutations, "permutations of solutions")
     board_permutations_index = 0
     true_path_index = 0
     Does_Laser_Hit_Targets = False
     
-    # board_permutations_set = set(board_permutations)
     
     m = Matrix(matrix_width,matrix_height)
-    m.print_matrix_with_indices()
     
     
     target_list_len = len(copy.copy(Original_Board.get_points()))
-    print(target_list_len)
     
     current_match = 0
     laser_path_points_to_remember = list()
-    check_bool = False  
-       
-    while Does_Laser_Hit_Targets != True:
-    # for i in range(0,10,1):
+    untouched_blocks = []   
+    
+    while board_permutations_index != len(board_permutations):
+    # for i in range(0,4,1):
         
-        # if laser_path_points_to_remember != 0:
-        #     for i in laser_path_points_to_remember:
-        #         if(i in board_permutations[board_permutations_index]):
-        #             # check_bool =True
-        #             print('yeay')
-        #             print(board_permutations_index)
-        #             # print(check_bool)
-        #     # if check_bool != True:
-        #     #     board_permutations_index+=1
-        #     #     continue
+        # print("Before: ", len(board_permutations))
         
+        # check_bool = False
+        # potential_blocks = []  
+        # print(untouched_blocks)
+        # for board_answer in board_permutations:
+        #     for i in board_permutations[board_permutations_index]:
+        #         if (i in untouched_blocks):
+        #             check_bool != True
+        #     if check_bool:
+        #         potential_blocks.append(board_answer)
         
+        # board_permutations = potential_blocks 
+             
+
+        # print("After: ", len(board_permutations))        
+                
+                
         Board1 = Board(board, A, B, C, lasers, laser_dir, points)
-        print(board_permutations_index)
+        # print(board_permutations_index)
         
         
         placed_count = 0
-        total_allowed_to_be_placed = num_A_blocks+num_B_blocks+num_C_blocks
-        
-        # for items in board_permutations[board_permutations_index]:
-        #     if items[0] != 'x':
-        #         placed_count += 1
-        
-        # if (placed_count - fixed_count >= total_allowed_to_be_placed) == False:
-        #             # print('Sad!')
-        #             board_permutations_index+=1
-        #             continue
-        
-        # print("hehes")
-        # print(placed_count - fixed_count >= total_allowed_to_be_placed)
-        # print(" ")
-        print(board_permutations[board_permutations_index])
+        total_allowed_to_be_placed = num_A_blocks+num_B_blocks+num_C_blocks       
+
         # # print(rebuild_matrix(board,board_permutations[board_permutations_index]))
         new_board = rebuild_matrix(board,board_permutations[board_permutations_index])
-        # print(board)
-        # print("test")
-        # print(new_board)
+ 
         
         target_list = copy.copy(Board1.get_points())
         laser_list = copy.copy(Board1.get_Lasers())
@@ -1461,9 +1715,6 @@ if __name__ == "__main__":
                     next_dir = interaction[3]
                     new_dir = interaction [4]
                     og_pos = interaction[5]
-                    #Create a new laser and add it to the list
-                    # print(new_pos, next_dir)
-                    # print("I am creating a new laser starting at ", og_pos, "going in ", new_dir)
                     laser_list.append(og_pos)
                     laser_dir_list.append(new_dir)
                     
@@ -1473,8 +1724,7 @@ if __name__ == "__main__":
                     
             while validate:
                 interaction = laser_1_step(m,new_pos, next_dir)
-                # print('inner')
-                # print(interaction)
+
                 interaction_len = 0
                 if type(interaction) != bool:
                     interaction_len = len(interaction)
@@ -1485,11 +1735,9 @@ if __name__ == "__main__":
                     behavior = interaction[1]
                     new_pos = interaction [2]
                     next_dir = interaction[3]
-                    # print(new_pos, next_dir)
 
                     if behavior == 'stop':
                         validate = False
-                        # length_of_laser_list+=1
                 
                 elif interaction_len == 6:
                     
@@ -1499,9 +1747,6 @@ if __name__ == "__main__":
                     next_dir = interaction[3]
                     new_dir = interaction [4]
                     og_pos = interaction[5]
-                    #Create a new laser and add it to the list
-                    # print(new_pos, next_dir)
-                    # print("I am creating a new laser starting at ", og_pos, "going in ", new_dir)
                     laser_list.append(og_pos)
                     laser_dir_list.append(new_dir)
                     length_of_laser_list +=1
@@ -1517,26 +1762,82 @@ if __name__ == "__main__":
         
         this_iteration_overlap = len(list(laser_path_set.intersection(target_list_set)))
         
-        if(this_iteration_overlap > current_match):
-            print(this_iteration_overlap)
-            # print("Targets: ", target_list_set)
-            # print("Laser Path: ", laser_path_set)
-            print(board_permutations[board_permutations_index])
-            current_match = this_iteration_overlap
-            laser_path_points_to_remember = board_permutations[board_permutations_index]
+
+        brand_new_board = (rebuild_matrix(board,board_permutations[board_permutations_index]))
+        all_lefts = get_All_Left_Walls(brand_new_board)
+        all_rights = get_All_Right_Walls(brand_new_board)
+        all_tops = get_All_Top_Walls(brand_new_board)
+        all_bottoms = get_All_Bottom_Walls(brand_new_board)
+        all_centers = get_All_Centers(brand_new_board)
+        
+        
+        center_x, center_y = int(), int()
+        laser_wall_intersection_arr = []
+        
+        for i in range(len(all_centers)):
+            for item in laser_path_set:
+                if item in all_lefts[3*i]:
+                    temp_x, temp_y = all_lefts[3*i][1]
+                    center_x, center_y = temp_x-1, temp_y
+                    laser_wall_intersection_arr.append((center_x,center_y))
+                    
+                if item in all_rights[3*i]:
+                    temp_x, temp_y = all_rights[3*i][1]
+                    center_x, center_y = temp_x+1, temp_y
+                    laser_wall_intersection_arr.append((center_x,center_y))
+                    
+                if item in all_tops[3*i]:
+                    temp_x, temp_y = all_tops[3*i][1]
+                    center_x, center_y = temp_x, temp_y-1
+                    laser_wall_intersection_arr.append((center_x,center_y))
+                    
+                if item in all_bottoms[3*i]:
+                    temp_x, temp_y = all_bottoms[3*i][1]
+                    center_x, center_y = temp_x, temp_y+1
+                    laser_wall_intersection_arr.append((center_x,center_y))
+                    
+        
+        laser_intersect_block_locations = []
+        # print(laser_wall_intersection_arr)
+        
+        # print(all_centers[0])
+        # print(all_centers[3])
+        for i in laser_wall_intersection_arr:
+            center_x, center_y = i
+            
+            new_board_x = int((center_x - 1)/2)
+            new_board_y = int((center_y - 1)/2)
+            laser_intersect_block_locations.append((new_board_x,new_board_y))
+        
+        # # print('The Block Locations that have Laser touching them are ', laser_intersect_block_locations)
+        # untouched_blocks = []
+        # for applied_blocks in (board_permutations[board_permutations_index]):
+        #     if (applied_blocks[1],applied_blocks[2]) not in laser_intersect_block_locations:
+        #         untouched_blocks.append(applied_blocks)
+        
+        # print(untouched_blocks)
+        # # print(get_All_Walls(brand_new_board))
+        
+        # # if(this_iteration_overlap > current_match):
+        # #     print(this_iteration_overlap)
+        # #     # print(board_permutations[board_permutations_index])
+        # #     current_match = this_iteration_overlap
+        # #     laser_path_points_to_remember = board_permutations[board_permutations_index]
             
         
         if target_list_set.issubset(laser_path_set) :
-            placed_count = 0
-            for items in board_permutations[board_permutations_index]:
-                if items[0] != 'x':
-                    placed_count += 1
+            Does_Laser_Hit_Targets = True
+            true_path_index = board_permutations_index
+            
+            
+        #     placed_count = 0
+        #     for items in board_permutations[board_permutations_index]:
+        #         if items[0] != 'x':
+        #             placed_count += 1
                         
-                total_allowed_to_be_placed = num_A_blocks+num_B_blocks+num_C_blocks
-                # print(total_allowed_to_be_placed, placed_count)
-                if placed_count - fixed_count >= total_allowed_to_be_placed:
-                    Does_Laser_Hit_Targets = True
-                    true_path_index = board_permutations_index
+        #         total_allowed_to_be_placed = num_A_blocks+num_B_blocks+num_C_blocks
+        #         # print(total_allowed_to_be_placed, placed_count)
+        #         if placed_count - fixed_count >= total_allowed_to_be_placed:
 
         if (board_permutations_index == total_permutations):
             Does_Laser_Hit_Targets = True
@@ -1549,11 +1850,16 @@ if __name__ == "__main__":
         # print(laser_list)
         
     if(Does_Laser_Hit_Targets):
+        print("Here is the path the laser takes")
+        m.print_matrix_with_indices()
+    
         print("You want to place the blocks in the following position: ", board_permutations[true_path_index])
         print("This placement should yield the correct solution")
         print(rebuild_matrix(board,board_permutations[true_path_index]))
-        m.print_matrix_with_indices()
     
+    else:
+        print("No Soultion Found")
+       
         
 
 
